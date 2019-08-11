@@ -1,17 +1,17 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { Link } from 'react-router-dom'
 import "../App.css";
-import logoFooter from "../assets/logo/logo-footer.png";
-import logoHeader from "../assets/logo/logo.png";
 import imageSection from "../assets/images/slide.jpg";
 import imgSearch from "../assets/logo/search.png";
 import imgChoose from "../assets/logo/choose.png";
 import imgDelivery from "../assets/logo/delivery.png";
 import imgFood from "../assets/logo/food.png";
 import db from "../db";
+import Header from './Header';
+import Footer from "./Footer";
 
 function Home() {
   const [restaurants, setRestaurants] = useState([]);
+  
   
   function onSelectChange(e) {
     const value = parseInt(e.target.value);
@@ -29,31 +29,7 @@ function Home() {
 
   return (
     <Fragment>
-      <header>
-        <div className="container-nav">
-          <div className="logo-box">
-            <a href="#">
-              <img src={logoHeader} />
-            </a>
-          </div>
-          <nav>
-            <div className="toggle">
-              <i className="fas fa-bars" id="menu-bar" />
-            </div>
-            <ul>
-              <li>
-                <a href="#">Acasa</a>
-              </li>
-              <li>
-                <a href="about.html">Despre noi</a>
-              </li>
-              <li>
-                <a href="contact.html">Contact</a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       <div className="section">
         <img src={imageSection} />
@@ -119,46 +95,7 @@ function Home() {
           </div>
         </div>
       </main>
-
-      <footer>
-        <div className="footer-left">
-          <img src={logoFooter} />
-          <p className="footer-links">
-            <a href="index.html">Acasa</a> |<a href="#">Contact</a>
-          </p>
-          <p className="footer-name">iQuest-Academy &copy; 2019</p>
-        </div>
-        <div className="footer-center">
-          <div>
-            <i className="fa fa-phone" />
-            <p>0712345678</p>
-          </div>
-          <div>
-            <i className="fa fa-envelope" />
-            <p>
-              <a href="mailto:support@company.com">support@lets-eat.com</a>
-            </p>
-          </div>
-        </div>
-        <div className="footer-right">
-          <p className="footer-about">
-            <span>Despre noi</span>
-            Lorem ipsum dolor sit amet, consectateur adispicing elit. Fusce
-            euismod convallis velit, eu auctor lacus vehicula sit amet.
-          </p>
-          <div className="footer-icons">
-            <a href="https://www.facebook.com/">
-              <i className="fa fa-facebook-f" />
-            </a>
-            <a href="https://www.twitter.com/">
-              <i className="fa fa-twitter" />
-            </a>
-            <a href="https://www.instagram.com">
-              <i className="fa fa-instagram" />
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </Fragment>
   );
 }

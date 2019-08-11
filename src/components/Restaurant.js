@@ -1,16 +1,16 @@
 import React, { useContext, useEffect, useState} from 'react';
 import '../App.css';
-import logoFooter from '../assets/logo/logo-footer.png';
-import logoHeader from '../assets/logo/logo.png';
 import db from '../db';
 import { CartContext } from '../CartContext';
 import { BrowserRouter as Router, Link } from "react-router-dom";
-
+import Header from './Header';
+import Footer from './Footer';
 
 function Restaurant() {
   const pathname = window.location.pathname;
   const [foods, setFoods] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [modal, triggerModal] = useState(false);
   
   const id = pathname.split('/')[2];
   const restaurant = db.restaurants.find(_ => _.id === parseInt(id));
@@ -19,6 +19,14 @@ function Restaurant() {
     const filter = pathname.split('/')[3];
     setFilter(filter);
   }, []);
+
+  const handleOpenModal = () => {
+    triggerModal(true);
+  }
+
+  const handleCloseModal = () => {
+    triggerModal(false);
+  }
 
   const setFilter = (activeFilter) => {
     if(activeFilter) {
@@ -67,25 +75,7 @@ function Restaurant() {
 
   return (
     <Router>
-      <header id="header">
-        <div className="container-nav">
-          <div className="logo-box">
-            <a href="index.html">
-              <img src={logoHeader} />
-            </a>
-          </div>
-          <nav>
-            <div className="toggle">
-            <i className="fa fa-bars" id="menu-bar"></i>
-            </div>
-            <ul>
-              <li><a href="index.html">Acasa</a></li>
-              <li><a href="about.html">Despre noi</a></li>
-              <li><a href="contact.html">Contact</a></li>
-          </ul>
-          </nav>
-        </div>
-    </header>
+      <Header />
 
       <main>
         <h1 className="restaurant-name"></h1>
@@ -106,7 +96,7 @@ function Restaurant() {
           <Link onClick={() => setFilter('dressing')} to={`/restaurant/${restaurant.id}/dressing`} className="btn">Garnituri/Paine/Sosuri</Link>
         </div>
         <div className="navbar-sub"> </div>
-        <div className="cart trigger mobile">
+        <div className="cart trigger mobile" onClick={() => handleOpenModal()}>
           <i className="fa fa-shopping-cart"></i>
         </div>
         <div className="inner">
@@ -145,24 +135,22 @@ function Restaurant() {
               </div>
             </div>
             <div className="cart-items">
-
-            { cart.map((item,key) => {
-              return (
-                <div key={key} className="d-flex">
-                  <div className="cart-item cart-column">
-                    <img className="cart-item-image" src={require(`../${item.image}`)} width="100" height="100" />
-                    <br />
-                    <span className="cart-item-title">{item.name}</span>
+              { cart.map((item,key) => {
+                return (
+                  <div key={key} className="d-flex">
+                    <div className="cart-item cart-column">
+                      <img className="cart-item-image" src={require(`../${item.image}`)} width="100" height="100" />
+                      <br />
+                      <span className="cart-item-title">{item.name}</span>
+                    </div>
+                    <span className="cart-price cart-column center-item">{item.price}</span>
+                    <div className="cart-quantity cart-column center-item">
+                      <input className="cart-quantity-input" onChange={(e) => handleQuantityChange(e, key, item.price)} min="1" type="number" value={item.quantity}/>     
+                      <i className="fa fa-trash delete" onClick={() => removeCart(key)}></i>
+                    </div>
                   </div>
-                  <span className="cart-price cart-column center-item">{item.price}</span>
-                  <div className="cart-quantity cart-column center-item">
-                    <input className="cart-quantity-input" onChange={(e) => handleQuantityChange(e, key, item.price)} min="1" type="number" value={item.quantity}/>     
-                    <i className="fa fa-trash delete" onClick={() => removeCart(key)}></i>
-                  </div>
-                </div>
-              );
-            })}
-
+                );
+              })}
             </div>
             <div className="cart-total">
               <strong className="cart-total-title">Total</strong>
@@ -181,73 +169,59 @@ function Restaurant() {
             </form>
           </div>
 
-          <div className="modal">
+          { modal && <div className="modal">
             <div className="modal-content">
-              <span className="close-button">×</span>
+              <span className="close-button" onClick={() => handleCloseModal()}>×</span>
               <div className="checkout" id="checkout-mobile">
-                <h3>Comanda</h3>
-                <hr />
-                <div className="checkout-product">
-                  <div className="cart-row">
-                    <span className="cart-item cart-header cart-column">Produs</span>
-                    <span className="cart-price cart-header cart-column">Pret</span>
-                    <span className="cart-quantity cart-header cart-column">Cantitate</span>
-                  </div>
+              <h3>Comanda</h3>
+              <hr />
+              <div className="checkout-product">
+                <div className="cart-row">
+                  <span className="cart-item cart-header cart-column">Produs</span>
+                  <span className="cart-price cart-header cart-column">Pret</span>
+                  <span className="cart-quantity cart-header cart-column">Cantitate</span>
                 </div>
-                <div className="cart-items">
-                </div>
-                <div className="cart-total">
-                  <strong className="cart-total-title">Total</strong>
-                  <span className="cart-total-price">0 lei</span>
-                </div>
-                <hr />
-                <h4>Adresa livrare:</h4>
-                <form className="command">
-                  <label id="town" name="town">Oras</label>
-                  <input type="text" name="town" id="town" />
-                  <label id="address" name="address">Adresa</label>
-                  <input type="text" name="address" /> 
-                  <label id="phone" name="phone">Telefon</label>
-                  <input type="phone" name="phone" />
-                  <input type="submit" className="inline command-button-mobile" id="send" value="Trimite" />
-                </form>
+              </div>
+              <div className="cart-items">
+                { cart.map((item,key) => {
+                  return (
+                    <div key={key} className="d-flex">
+                      <div className="cart-item cart-column">
+                        <img className="cart-item-image" src={require(`../${item.image}`)} width="100" height="100" />
+                        <br />
+                        <span className="cart-item-title">{item.name}</span>
+                      </div>
+                      <span className="cart-price cart-column center-item">{item.price}</span>
+                      <div className="cart-quantity cart-column center-item">
+                        <input className="cart-quantity-input" onChange={(e) => handleQuantityChange(e, key, item.price)} min="1" type="number" value={item.quantity}/>     
+                        <i className="fa fa-trash delete" onClick={() => removeCart(key)}></i>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="cart-total">
+                <strong className="cart-total-title">Total</strong>
+                <span className="cart-total-price"> {totalPrice} lei</span>
+              </div>
+              <hr /> 
+              <h4>Adresa livrare:</h4>
+              <form className="command" action='#' method='#'>
+                <label id="town" name="town">Oras</label>
+                <input type="text" name="town" id="town" />
+                <label id="address" name="address">Adresa</label>
+                <input type="text" name="address" />
+                <label id="phone" name="phone">Telefon</label>
+                <input type="phone" name="phone" />
+                <input type="submit" className="inline command-button-desktop" id="send" value="Trimite" />
+              </form>
               </div>
             </div>
-          </div>
+          </div> }
         </div>
       </main>
 
-      <footer>
-        <div className="footer-left">
-          <img src={logoFooter} />
-          <p className="footer-links">
-            <a href="index.html">Acasa</a> |			
-            <a href="#">Contact</a>
-          </p>
-          <p className="footer-name">iQuest-Academy &copy; 2019</p>
-        </div>
-        <div className="footer-center">
-          <div>
-            <i className="fa fa-phone"></i>
-            <p>0712345678</p>
-          </div>
-          <div>
-            <i className="fa fa-envelope"></i>
-            <p><a href="mailto:support@company.com">support@lets-eat.com</a></p>
-          </div>
-        </div>
-        <div className="footer-right">
-          <p className="footer-about">
-            <span>Despre noi</span>
-                Lorem ipsum dolor sit amet, consectateur adispicing elit. Fusce euismod convallis velit, eu auctor lacus vehicula sit amet.
-          </p>
-          <div className="footer-icons">
-            <a href="https://www.facebook.com/"><i className="fa fa-facebook-f"></i></a>
-            <a href="https://www.twitter.com/"><i className="fa fa-twitter"></i></a>
-            <a href="https://www.instagram.com"><i className="fa fa-instagram"></i></a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
       </Router>
   );
 }
